@@ -3,33 +3,49 @@ import { useState, useRef } from 'react';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
+// [중요] 빌드 시 서버 사이드에서 미리 렌더링하지 않도록 강제 설정
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [startTime, setStartTime] = useState("00:00:00");
   const [endTime, setEndTime] = useState("00:00:10");
   const [status, setStatus] = useState("1단계: 엔진을 활성화해주세요.");
-  const ffmpegRef = useRef(new FFmpeg());
+  
+  // FFmpeg 인스턴스를 처음에는 null로 설정 (서버 로딩 방지)
+  const ffmpegRef = useRef<FFmpeg | null>(null);
 
   const loadFFmpeg = async () => {
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    // 버튼을 눌렀을 때(브라우저 환경) 비로소 인스턴스 생성
+    if (!ffmpegRef.current) {
+      ffmpegRef.current = new FFmpeg();
+    }
+    
     const ffmpeg = ffmpegRef.current;
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    
     setStatus("엔진 로딩 중... (최초 1회는 시간이 걸립니다)");
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-    });
-    setLoaded(true);
-    setStatus("엔진 준비 완료! 파일을 선택하세요.");
+    
+    try {
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      });
+      setLoaded(true);
+      setStatus("엔진 준비 완료! 파일을 선택하세요.");
+    } catch (err) {
+      console.error(err);
+      setStatus("로딩 실패. 다시 시도해주세요.");
+    }
   };
 
   const handleTrim = async () => {
-    if (!videoFile) return alert("파일을 선택해주세요.");
+    if (!videoFile || !ffmpegRef.current) return alert("파일을 선택해주세요.");
     const ffmpeg = ffmpegRef.current;
     setStatus("영상 처리 중... 잠시만 기다려주세요.");
     
     await ffmpeg.writeFile('input.mp4', await fetchFile(videoFile));
-    // -c copy 옵션으로 매우 빠르게 처리
     await ffmpeg.exec(['-i', 'input.mp4', '-ss', startTime, '-to', endTime, '-c', 'copy', 'output.mp4']);
     
     const data = await ffmpeg.readFile('output.mp4');

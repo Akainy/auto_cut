@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  typescript: {
+    ignoreBuildErrors: true, // 타입 에러가 있어도 강제 진행
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // 린트 에러 무시
+  },
   async headers() {
     return [
       {

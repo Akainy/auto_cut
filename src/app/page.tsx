@@ -60,7 +60,7 @@ export default function Home() {
 
   return (
     <div className="p-10 flex flex-col items-center gap-5 font-sans">
-      <h1 className="text-3xl font-bold">🎬 AutoCut Serverless</h1>
+      <h1 className="text-3xl font-bold">🎬 AutoCut</h1>
       <div className="border p-8 rounded-xl bg-gray-50 flex flex-col gap-4 w-full max-w-md shadow-md">
         {!loaded ? (
           <button onClick={loadFFmpeg} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition">

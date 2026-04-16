@@ -59,8 +59,28 @@ export default function Home() {
   };
 
   return (
-    <div className="p-10 flex flex-col items-center gap-5 font-sans">
-      <h1 className="text-3xl font-bold">🎬 AutoCut</h1>
+    // 전체 컨테이너 패딩 유지
+    <div className="p-10 flex flex-col items-center gap-5 font-sans min-h-screen bg-gray-50/50">
+      
+      {/* --- 업그레이드된 로고 섹션 (H1 부분 변경) --- */}
+      <div className="flex flex-col items-center justify-center space-y-2 mb-8">
+        <div className="flex items-center space-x-3">
+          {/* 가위(비디오 컷) 아이콘 로고 + 블루 그라데이션 배경 */}
+          <div className="bg-gradient-to-tr from-blue-700 to-blue-400 p-2.5 rounded-2xl shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19.14 7.5c.32.33.32.85 0 1.18l-3.32 3.32c1.3.16 2.3 1.25 2.3 2.6V17a3 3 0 01-3 3h-2.1c-.88 0-1.7-.37-2.31-1.02L6 13.04a2.98 2.98 0 01-1-2.2c0-1.65 1.34-3 3-3h.6l4.24 4.24-1.18 1.18c-.2.2-.2.5 0 .7l.5.5c.2.2.5.2.7 0l2.31-2.32c.33-.32.85-.32 1.18 0l3.31 3.32c.2.2.5.2.7 0l1.18-1.18a.5.5 0 01.7 0c.32.32.32.85 0 1.17l-3.31 3.32a.49.49 0 000 .7c.2.2.5.2.7 0l4.31-4.3c1.17-1.17 1.17-3.07 0-4.24L19.14 7.5z" />
+            </svg>
+          </div>
+          {/* 볼드한 타이포그래피 + 그라데이션 텍스트 */}
+          <h1 className="text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-950 via-gray-700 to-gray-950">
+            AutoCut
+          </h1>
+        </div>
+        {/* 슬로건 추가 */}
+        <p className="text-gray-400 font-medium text-sm tracking-widest uppercase">Smart Video Trimming Tool</p>
+      </div>
+
+      {/* --- 제어 박스 및 나머지 코드 (기존과 완전히 동일) --- */}
       <div className="border p-8 rounded-xl bg-gray-50 flex flex-col gap-4 w-full max-w-md shadow-md">
         {!loaded ? (
           <button onClick={loadFFmpeg} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition">

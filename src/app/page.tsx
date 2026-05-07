@@ -43,10 +43,24 @@ export default function Home() {
   const handleTrim = async () => {
     if (!videoFile || !ffmpegRef.current) return alert("파일을 선택해주세요.");
     const ffmpeg = ffmpegRef.current;
-    setStatus("영상 처리 중... 잠시만 기다려주세요.");
+    setStatus("영상 정밀 분석 및 처리 중...");
     
     await ffmpeg.writeFile('input.mp4', await fetchFile(videoFile));
-    await ffmpeg.exec(['-i', 'input.mp4', '-ss', startTime, '-to', endTime, '-c', 'copy', 'output.mp4']);
+
+    /** * [수정 포인트] 
+     * 1. -ss와 -to를 -i 앞에 배치하여 정확한 위치 탐색
+     * 2. -c copy 대신 -c:v libx264(영상) 및 -c:a aac(음성)을 사용하여 재인코딩 (정밀한 프레임 컷팅 가능)
+     * 3. -preset ultrafast를 추가하여 브라우저 환경에서 인코딩 속도 최대화
+     */
+    await ffmpeg.exec([
+      '-ss', startTime, 
+      '-to', endTime, 
+      '-i', 'input.mp4', 
+      '-c:v', 'libx264', 
+      '-preset', 'ultrafast', 
+      '-c:a', 'aac', 
+      'output.mp4'
+    ]);
     
     const data = await ffmpeg.readFile('output.mp4');
     const url = URL.createObjectURL(new Blob([(data as any).buffer], { type: 'video/mp4' }));

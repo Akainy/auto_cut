@@ -43,22 +43,20 @@ export default function Home() {
   const handleTrim = async () => {
     if (!videoFile || !ffmpegRef.current) return alert("파일을 선택해주세요.");
     const ffmpeg = ffmpegRef.current;
-    setStatus("영상 정밀 분석 및 처리 중...");
+    setStatus("재인코딩 없이 고속 컷팅 중...");
     
     await ffmpeg.writeFile('input.mp4', await fetchFile(videoFile));
 
-    /** * [수정 포인트] 
-     * 1. -ss와 -to를 -i 앞에 배치하여 정확한 위치 탐색
-     * 2. -c copy 대신 -c:v libx264(영상) 및 -c:a aac(음성)을 사용하여 재인코딩 (정밀한 프레임 컷팅 가능)
-     * 3. -preset ultrafast를 추가하여 브라우저 환경에서 인코딩 속도 최대화
+    /** * [성능 최적화 수정 포인트]
+     * 재인코딩 과정(-c:v libx264 등)을 전면 생략하고 '-c copy' 옵션을 적용했습니다.
+     * 이로 인해 브라우저가 영상을 다시 압축하지 않고 원본 데이터를 그대로 잘라내어 
+     * 처리 속도가 파일 복사 수준으로 빨라집니다.
      */
     await ffmpeg.exec([
       '-ss', startTime, 
       '-to', endTime, 
       '-i', 'input.mp4', 
-      '-c:v', 'libx264', 
-      '-preset', 'ultrafast', 
-      '-c:a', 'aac', 
+      '-c', 'copy', 
       'output.mp4'
     ]);
     
